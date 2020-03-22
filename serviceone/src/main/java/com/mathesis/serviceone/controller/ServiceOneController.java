@@ -17,11 +17,30 @@ import org.springframework.web.client.RestTemplate;
 public class ServiceOneController {
     @Value("${server.port}")
     String serverPort;
+    @Value("${request.loading.time.profile}")
+    String requestLoadingTimeProfile;
 
     @GetMapping
-    public String serviceCall() {
-        log.info("ServiceOne Caled");
+    public String serviceCall() throws InterruptedException {
+        log.info("ServiceOne Called");
         log.warn("DEBUG: this is a debug info");
+        Thread.sleep(interpretRequestLoadingTimeProfile(requestLoadingTimeProfile));
         return "<h1 style=\"color: red\">Welcome in service one</h1><h3>Currently running on port:" + serverPort + "</h3>";
+    }
+    private Long interpretRequestLoadingTimeProfile(String requestLoadingTimeProfile) {
+        final Long result;
+        switch (requestLoadingTimeProfile) {
+            case "medium": {
+                result = 1000l;
+                break;
+            } case "long": {
+                result = 5000l;
+                break;
+            } default: {
+                result = 10l;
+                break;
+            }
+        }
+        return result;
     }
 }

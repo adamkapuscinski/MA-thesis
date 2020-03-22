@@ -4,9 +4,16 @@ spring:
 server:
   port: ${port:28880}
 eureka:
+  instance:
+    lease-renewal-interval-in-seconds: 10
   client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-logging:
-  level:
-    root: debug
+    serviceUrl:
+      defaultZone: http://${ENVIRONMENT_HOST:localhost}:8761/eureka
+request:
+  loading:
+    time:
+      profile: ${REQUEST_LOADING_TIME:short}
+#
+#request:
+#  loading:
+#    time: ${REQUEST_LOADING_TIME:10}
