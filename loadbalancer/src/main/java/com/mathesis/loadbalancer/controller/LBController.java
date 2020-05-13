@@ -63,8 +63,8 @@ public class LBController {
         this.map.put(registeredService, recentRequestData.stream().filter(o -> o.getServiceIdentity().equals(registeredService)).collect(Collectors.toList()));
     }
 
-    @GetMapping("/stats")
-    public Map<String, List<ServiceRequestData>> getStatistics() {
-        return map;
+    @GetMapping("api/stats")
+    public List<ServiceRequestData> getStatistics() {
+        return recentRequestData;
     }
 }
