@@ -1,10 +1,10 @@
-package com.mathesis.servicetwo;
+package com.mathesis.servicethree;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ServicetwoApplicationTests {
+class ServiceoneApplicationTests {
 
 	@Test
 	void contextLoads() {
