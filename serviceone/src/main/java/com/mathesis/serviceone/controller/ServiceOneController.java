@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ServiceOneController {
     @Value("${server.port}")
     String serverPort;
-    private Long param = 1000L;
+    private Long param = 10L;
 
     @GetMapping
     public String serviceCall() throws InterruptedException {

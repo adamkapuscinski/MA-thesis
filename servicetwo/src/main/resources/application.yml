@@ -2,7 +2,7 @@ spring:
   application:
     name: servicetwo
 server:
-  port: ${port:28880}
+  port: ${port:28881}
 eureka:
   instance:
     lease-renewal-interval-in-seconds: 10
