@@ -1,6 +1,6 @@
 spring:
   application:
-    name: serviceone
+    name: servicetwo
 server:
   port: ${port:28880}
 eureka:
