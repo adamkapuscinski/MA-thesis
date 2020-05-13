@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: servicethree
+server:
+  port: ${port:28882}
+eureka:
+  instance:
+    lease-renewal-interval-in-seconds: 10
+  client:
+    serviceUrl:
+      defaultZone: http://${ENVIRONMENT_HOST:localhost}:8761/eureka
