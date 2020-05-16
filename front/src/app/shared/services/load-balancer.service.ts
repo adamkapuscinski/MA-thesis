@@ -3,8 +3,9 @@ import {HttpClient, HttpResponse} from '@angular/common/http';
 import {SERVER_API_URL} from '../../app.constants';
 import {Observable} from 'rxjs';
 import {IAppRequestData} from "../model/app-request-data.model";
+import {IChartDataModel} from "../model/chart-datatype.model";
 
-type MapResponseType = HttpResponse<IAppRequestData[]>;
+type ChartResponseType = HttpResponse<IChartDataModel>;
 
 @Injectable({ providedIn: 'root' })
 export class LoadBalancerService {
@@ -12,7 +13,8 @@ export class LoadBalancerService {
 
     constructor(private http: HttpClient) {}
 
-    public stats(): Observable<MapResponseType> {
-        return this.http.get<IAppRequestData[]>(this.resourceUrl, { observe: 'response' });
+    public stats(): Observable<ChartResponseType> {
+        return this.http.get<IChartDataModel>(this.resourceUrl, { observe: 'response' });
+        // return this.http.get<IAppRequestData[]>(this.resourceUrl, { observe: 'response' });
     }
 }

@@ -1,13 +1,5 @@
 <button [routerLink]="''" class="btn btn-info">Strona startowa</button>
-<p>load-balancer-stats works!</p>
 
-
-<ng-container *ngIf="dataAvailable">
-  <h5>Stats:</h5>
-  <div *ngFor="let item of stats.entries(); let i = index; ">
-    <h5>{{item[0]}}</h5>
-    <span *ngFor="let el of item[1]">
-      {{el.duration}}
-    </span>
-  </div>
+<ng-container *ngIf="data">
+  <p-chart type="line" [data]="data"></p-chart>
 </ng-container>
