@@ -1,5 +1,8 @@
 package com.mathesis.loadbalancer.controller;
 
+import com.mathesis.loadbalancer.controller.balancing.BalancingStrategy;
+import com.mathesis.loadbalancer.controller.balancing.DistributeBurdenStrategy;
+import com.mathesis.loadbalancer.controller.balancing.SequentiallyStrategy;
 import com.mathesis.loadbalancer.domain.ServiceRequestData;
 import com.mathesis.loadbalancer.domain.chart.ChartDataModel;
 import com.mathesis.loadbalancer.domain.chart.ChartSetDataModel;
@@ -16,6 +19,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -26,15 +30,18 @@ public class LBProvider {
     private ChartDataModel data = new ChartDataModel();
 
     List<ServiceRequestData> recentRequestData = new ArrayList<>();
-    private int serviceIdx = 0;
 
     @Autowired
     private RestTemplate restTemplate;
+
     @Autowired
     private DiscoveryClient discoveryClient;
+    private BalancingStrategy balancingStrategy;
 
     @PostConstruct
     public void init() {
+        balancingStrategy = new DistributeBurdenStrategy();
+        balancingStrategy.setDiscoveryClient(discoveryClient);
         this.data.setLabels(new ArrayList<>());
         List<DataSet> dataSets = new ArrayList<>();
         for (int i = 0; i < registeredServices.length; i++) {
@@ -124,22 +131,15 @@ public class LBProvider {
         }
     }
     String callSomeService() {
-
-        List<ServiceInstance> instances = this.discoveryClient.getInstances(registeredServices[serviceIdx]);
+        ServiceInstance serviceInstance = balancingStrategy.pickService(registeredServices, recentRequestData);
         String result = "";
-        if (instances.size() > 0) {
-            ServiceInstance serviceInstance = instances.get(0);
-            Instant start = Instant.now();
+        if (Objects.nonNull(serviceInstance)) {
             String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort() + "/";
             System.out.println("calling url: " + url);
+            Instant start = Instant.now();
             result = restTemplate.getForObject(url, String.class);
             Instant finish = Instant.now();
-            assignParamsToMap(start, finish, registeredServices[serviceIdx]);
-        }
-
-        serviceIdx++;
-        if (serviceIdx > 2) {
-            serviceIdx = 0;
+            assignParamsToMap(start, finish, serviceInstance.getServiceId());
         }
         return result;
     }
