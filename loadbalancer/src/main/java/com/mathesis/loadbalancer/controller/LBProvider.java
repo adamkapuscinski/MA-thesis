@@ -18,7 +18,7 @@ public class LBProvider {
 
     ChartSetDataModel assignDataObject(String[] registeredServices, List<ServiceRequestData> recentRequestData) {
         int timeToShowInMinutes = 5;
-        int synchronizationTime = 20;
+        int synchronizationTime = 10;
 
         ChartSetDataModel result = new ChartSetDataModel();
         ChartDataModel firstSet = new ChartDataModel();
