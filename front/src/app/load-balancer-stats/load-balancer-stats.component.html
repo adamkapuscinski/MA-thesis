@@ -1,5 +1,12 @@
 <button [routerLink]="''" class="btn btn-info">Strona startowa</button>
-
+<button class="btn btn-primary" (click)="callLoadBalancer()">
+  <fa-icon icon="spinner" [spin]="calling"></fa-icon>
+  Call Load Balancer
+</button>
+<button class="btn btn-info" (click)="loadStats()">
+  <fa-icon icon="sync" [spin]="loadingStats"></fa-icon>
+  Refresh Chart
+</button>
 <ng-container *ngIf="data">
   <p-chart type="line" [data]="data"></p-chart>
 </ng-container>

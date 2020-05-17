@@ -15,6 +15,8 @@ export class LoadBalancerService {
 
     public stats(): Observable<ChartResponseType> {
         return this.http.get<IChartDataModel>(this.resourceUrl, { observe: 'response' });
-        // return this.http.get<IAppRequestData[]>(this.resourceUrl, { observe: 'response' });
+    }
+    call(): Observable<HttpResponse<any>> {
+      return this.http.get<any>('api/call', { observe: 'response' });
     }
 }
