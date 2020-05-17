@@ -7,6 +7,11 @@
   <fa-icon icon="sync" [spin]="loadingStats"></fa-icon>
   Refresh Chart
 </button>
-<ng-container *ngIf="data">
-  <p-chart type="line" [data]="data"></p-chart>
+<ng-container *ngIf="firstSet">
+  <h3>Chart presenting average response time on time axis with 20 seconds interval</h3>
+  <p-chart type="line" [data]="firstSet"></p-chart>
+</ng-container>
+<ng-container *ngIf="secondSet">
+  <h3>Chart presenting called times on time axis with 20 seconds interval</h3>
+  <p-chart type="line" [data]="secondSet"></p-chart>
 </ng-container>

@@ -10,7 +10,8 @@ import {IChartDataModel} from "../shared/model/chart-datatype.model";
 })
 export class LoadBalancerStatsComponent implements OnInit {
   stats: Map<string, IAppRequestData[]> = new Map<string, IAppRequestData[]>();
-  data: IChartDataModel;
+  firstSet: IChartDataModel;
+  secondSet: IChartDataModel;
   calling = false;
   loadingStats = false;
 
@@ -30,9 +31,11 @@ export class LoadBalancerStatsComponent implements OnInit {
     this.loadingStats = true;
     this.loadBalancerService.stats().subscribe(res => {
       this.loadingStats = false;
-      this.data = undefined;
+      this.firstSet = undefined;
+      this.secondSet = undefined;
       setTimeout(() => {
-        this.data = res.body;
+        this.firstSet = res.body.firstSet;
+        this.secondSet = res.body.secondSet;
       });
     });
   }
