@@ -8,7 +8,7 @@ services:
     networks:
       - network-eureka
   eureka-client-peer1:
-    image: adamkapuscinsky/ma-thesis-eureka-client
+    image: adamkapuscinsky/ma-thesis-eureka-client-serviceone
     container_name: eureka-client-peer1
     environment:
       - ENVIRONMENT_HOST=eureka-server-peer1
@@ -36,14 +36,23 @@ services:
       - "28882:28882"
     networks:
       - network-eureka
-  gateway:
-    image: adamkapuscinsky/ma-thesis-gateway
-    container_name: gateway
+  load-balancer:
+    image: adamkapuscinsky/ma-thesis-load-balancer
+    container_name: load-balancer
     environment:
       - ENVIRONMENT_HOST=eureka-server-peer1
     ports:
-      - "8088:8088"
+      - "8080:8080"
     networks:
       - network-eureka
+  # front:
+  #   image: adamkapuscinsky/ma-thesis-front
+  #   container_name: front
+  #   environment:
+  #     - ENVIRONMENT_HOST=eureka-server-peer1
+  #   ports:
+  #     - "4200:4200"
+  #   networks:
+  #     - network-eureka
 networks:
   network-eureka:
