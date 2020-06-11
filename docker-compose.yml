@@ -5,6 +5,7 @@ services:
     container_name: eureka-server-peer1
     ports:
       - "8761:8761"
+    restart: always
     networks:
       - network-eureka
   eureka-client-peer1:
@@ -36,23 +37,25 @@ services:
       - "28882:28882"
     networks:
       - network-eureka
-  load-balancer:
+  api:
     image: adamkapuscinsky/ma-thesis-load-balancer
-    container_name: load-balancer
+    container_name: api
     environment:
       - ENVIRONMENT_HOST=eureka-server-peer1
     ports:
       - "8080:8080"
+    restart: always
     networks:
       - network-eureka
-  # front:
-  #   image: adamkapuscinsky/ma-thesis-front
-  #   container_name: front
-  #   environment:
-  #     - ENVIRONMENT_HOST=eureka-server-peer1
-  #   ports:
-  #     - "4200:4200"
-  #   networks:
-  #     - network-eureka
+  client:
+    links:
+      - api
+    image: adamkapuscinsky/ma-thesis-front
+    restart: on-failure
+    container_name: client
+    ports:
+      - "4200:80"
+    networks:
+      - network-eureka
 networks:
   network-eureka:
