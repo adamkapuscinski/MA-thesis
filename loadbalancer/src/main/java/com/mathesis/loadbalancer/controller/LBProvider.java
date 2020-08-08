@@ -3,11 +3,14 @@ package com.mathesis.loadbalancer.controller;
 import com.mathesis.loadbalancer.controller.balancing.BalancingStrategy;
 import com.mathesis.loadbalancer.controller.balancing.DistributeBurdenStrategy;
 import com.mathesis.loadbalancer.controller.balancing.SequentiallyStrategy;
+import com.mathesis.loadbalancer.controller.balancing.model.BalancingParamsTransmissionModel;
+import com.mathesis.loadbalancer.controller.balancing.model.BalancingMethodTypeEnum;
+import com.mathesis.loadbalancer.controller.balancing.model.DefaultAppRequestTime;
+import com.mathesis.loadbalancer.controller.balancing.model.RequestCallTypeEnum;
 import com.mathesis.loadbalancer.domain.ServiceRequestData;
 import com.mathesis.loadbalancer.domain.chart.ChartDataModel;
 import com.mathesis.loadbalancer.domain.chart.ChartSetDataModel;
 import com.mathesis.loadbalancer.domain.chart.DataSet;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.stereotype.Service;
@@ -28,20 +31,21 @@ public class LBProvider {
     private String[] registeredServices = new String[]{"SERVICEONE", "SERVICETWO", "SERVICETHREE"};
 
     private ChartDataModel data = new ChartDataModel();
+    private BalancingParamsTransmissionModel lastBalancingParamsTransmissionModel = new BalancingParamsTransmissionModel(BalancingMethodTypeEnum.AVERAGE_RESPONSE_TIME, RequestCallTypeEnum.ESTABLISHED_PARAMS, new ArrayList<>());
+    private List<ServiceRequestData> recentRequestData = new ArrayList<>();
 
-    List<ServiceRequestData> recentRequestData = new ArrayList<>();
-
-    @Autowired
     private RestTemplate restTemplate;
-
-    @Autowired
     private DiscoveryClient discoveryClient;
     private BalancingStrategy balancingStrategy;
 
+    public LBProvider(RestTemplate restTemplate, DiscoveryClient discoveryClient) {
+        this.restTemplate = restTemplate;
+        this.discoveryClient = discoveryClient;
+    }
+
     @PostConstruct
     public void init() {
-        balancingStrategy = new DistributeBurdenStrategy();
-        balancingStrategy.setDiscoveryClient(discoveryClient);
+        balancingStrategy = pickStrategyBasedOnBalancingMethod(lastBalancingParamsTransmissionModel.getMethodType());
         this.data.setLabels(new ArrayList<>());
         List<DataSet> dataSets = new ArrayList<>();
         for (int i = 0; i < registeredServices.length; i++) {
@@ -132,15 +136,13 @@ public class LBProvider {
     }
     String callSomeService() {
         ServiceInstance serviceInstance = balancingStrategy.pickService(registeredServices, recentRequestData);
-        String result = "";
-        if (Objects.nonNull(serviceInstance)) {
-            String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort() + "/";
-            System.out.println("calling url: " + url);
-            Instant start = Instant.now();
-            result = restTemplate.getForObject(url, String.class);
-            Instant finish = Instant.now();
-            assignParamsToMap(start, finish, serviceInstance.getServiceId());
+
+        String urlAddon = "";
+        RequestCallTypeEnum callType = lastBalancingParamsTransmissionModel.getCallType();
+        if (callType.equals(RequestCallTypeEnum.RANDOM_MATRIX_TRANSPOSE)) {
+            urlAddon = "random-burden";
         }
+        String result = callGetMethodOnServiceInstance(serviceInstance, urlAddon, true);
         return result;
     }
 
@@ -148,5 +150,46 @@ public class LBProvider {
         long duration = Duration.between(start, finish).toMillis();
         ServiceRequestData serviceRequestDataObj = new ServiceRequestData(start, registeredService, finish, duration);
         recentRequestData.add(serviceRequestDataObj);
+    }
+
+    BalancingParamsTransmissionModel assignBalancingParams(BalancingParamsTransmissionModel balancingParamsTransmissionModel) {
+        if (Objects.nonNull(balancingParamsTransmissionModel)) {
+            balancingStrategy = pickStrategyBasedOnBalancingMethod(balancingParamsTransmissionModel.getMethodType());
+            assignDefaultParameters(balancingParamsTransmissionModel.getDefaultAppsRequestTime());
+            balancingStrategy.setDiscoveryClient(discoveryClient);
+            recentRequestData = new ArrayList<>();
+            lastBalancingParamsTransmissionModel = balancingParamsTransmissionModel;
+        }
+        return balancingParamsTransmissionModel;
+    }
+
+    private void assignDefaultParameters(List<DefaultAppRequestTime> defaultAppsRequestTime) {
+        defaultAppsRequestTime.forEach(appRequestTime -> {
+            ServiceInstance serviceInstance = balancingStrategy.pickServiceBasedOnName(discoveryClient, appRequestTime.getApplicationType());
+            callGetMethodOnServiceInstance(serviceInstance, "param/" + appRequestTime.getRequestTime(), false);
+        });
+    }
+    private String callGetMethodOnServiceInstance(ServiceInstance serviceInstance, String urlAddon, Boolean shouldAddConnectionTimeToMap) {
+        String result = "";
+        if (Objects.nonNull(serviceInstance)) {
+            String url = "http://" + serviceInstance.getHost() + ":" + serviceInstance.getPort() + "/" + urlAddon;
+            System.out.println("calling url: " + url);
+            Instant start = Instant.now();
+            result = restTemplate.getForObject(url, String.class);
+            Instant finish = Instant.now();
+            if (shouldAddConnectionTimeToMap)
+                assignParamsToMap(start, finish, serviceInstance.getServiceId());
+        }
+        return result;
+    }
+
+    private BalancingStrategy pickStrategyBasedOnBalancingMethod(BalancingMethodTypeEnum balancingMethodTypeEnum) {
+        BalancingStrategy res = new DistributeBurdenStrategy();
+        if (BalancingMethodTypeEnum.SEQUENTIALLY.equals(balancingMethodTypeEnum)) {
+            res = new SequentiallyStrategy();
+        } else if (BalancingMethodTypeEnum.AVERAGE_RESPONSE_TIME.equals(balancingMethodTypeEnum)) {
+            res = new DistributeBurdenStrategy();
+        }
+        return res;
     }
 }

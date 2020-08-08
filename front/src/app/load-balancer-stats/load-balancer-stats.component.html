@@ -1,17 +1,63 @@
-<button [routerLink]="''" class="btn btn-info">Strona startowa</button>
+<ng-template #configurationPanel let-c="close()">
+  <div class="modal-header">
+    <h3>Edytuj parametry konfiguracyjne</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" (click)="c">&times;</button>
+  </div>
+  <div class="modal-body">
+    <ng-container *ngIf="tempConfig">
+      <div class="border shadow-lg">
+        <label for="callType">Sposób wywoływania żądań:</label>
+        <select class="form-control" id="callType" [(ngModel)]="tempConfig.callType">
+          <option [ngValue]="ESTABLISHED_PARAMS">Ustalone parametry</option>
+          <option [ngValue]="RANDOM_MATRIX_TRANSPOSE">Odwracanie randomowego rozmiaru macierzy</option>
+        </select>
+      </div>
+      <div class="border shadow-lg">
+        <label for="callType">Metoda balancingowa:</label>
+        <select class="form-control" id="methodType" [(ngModel)]="tempConfig.methodType">
+          <option [ngValue]="SEQUENTIALLY">Sekwencyjnie</option>
+          <option [ngValue]="AVERAGE_RESPONSE_TIME">Średni czas odpowiedzi endpointów</option>
+        </select>
+      </div>
+      <div *ngIf="tempConfig.defaultAppsRequestTime" class="border shadow-lg my-3">
+        <h5>Parametry defaultowe serwisów:</h5>
+        <div *ngFor="let appRequestTime of tempConfig.defaultAppsRequestTime; trackBy: trackId; let i = index" class="form-group w-100">
+          <label for="{{appRequestTime.applicationType}}">{{appRequestTime.applicationType}}</label>
+          <input [(ngModel)]="appRequestTime.requestTime" class="form-control" id="{{appRequestTime.applicationType}}"/>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+  <div class="modal-footer">
+    <div class="btn-group">
+      <button type="button" class="btn btn-secondary" (click)="c;">
+        <fa-icon [icon]="'ban'"></fa-icon>&nbsp;<span>Cancel</span>
+      </button>
+      <button type="button" class="btn btn-primary" (click)="c; assignParameters()">
+        <fa-icon [icon]="'save'"></fa-icon>&nbsp;<span>Save</span>
+      </button>
+    </div>
+  </div>
+</ng-template>
+<h1>Metody Load Balancingowe</h1>
+<button (click)="assignTempConfig(); openModal(configurationPanel, true)" class="btn btn-warning">
+  Open Configuration Panel
+</button>
 <button class="btn btn-primary" (click)="callLoadBalancer()">
   <fa-icon icon="spinner" [spin]="calling"></fa-icon>
-  Call Load Balancer
+  Call Service via Load Balancer
 </button>
 <button class="btn btn-info" (click)="loadStats()">
   <fa-icon icon="sync" [spin]="loadingStats"></fa-icon>
   Refresh Chart
 </button>
-<ng-container *ngIf="firstSet">
-  <h3>Chart presenting average response time on time axis with 20 seconds interval</h3>
-  <p-chart type="line" [data]="firstSet"></p-chart>
-</ng-container>
-<ng-container *ngIf="secondSet">
-  <h3>Chart presenting called times on time axis with 20 seconds interval</h3>
-  <p-chart type="line" [data]="secondSet"></p-chart>
-</ng-container>
+<div class="my-3">
+  <ng-container *ngIf="firstSet">
+    <h3>Chart presenting average response time on time axis with 20 seconds interval</h3>
+    <p-chart type="line" [data]="firstSet"></p-chart>
+  </ng-container>
+  <ng-container *ngIf="secondSet">
+    <h3>Chart presenting called times on time axis with 20 seconds interval</h3>
+    <p-chart type="line" [data]="secondSet"></p-chart>
+  </ng-container>
+</div>

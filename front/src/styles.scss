@@ -7,3 +7,9 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.full-width-modal > .modal-dialog {
+  max-width: none !important;
+  margin: 1rem;
+  top: 0 !important;
+}

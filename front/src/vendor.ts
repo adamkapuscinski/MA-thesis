@@ -6,9 +6,13 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faUser,
   faSpinner,
-  faSync
+  faSync,
+  faBan,
+  faSave
 } from '@fortawesome/free-solid-svg-icons';
 
 library.add(faUser);
 library.add(faSpinner);
 library.add(faSync);
+library.add(faBan);
+library.add(faSave);

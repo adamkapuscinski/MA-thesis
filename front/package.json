@@ -24,6 +24,7 @@
     "@fortawesome/angular-fontawesome": "0.3.0",
     "@fortawesome/fontawesome-svg-core": "1.2.8",
     "@fortawesome/free-solid-svg-icons": "5.5.0",
+    "@ng-bootstrap/ng-bootstrap": "4.0.0",
     "@types/quill": "^2.0.2",
     "chart.js": "^2.9.3",
     "hammerjs": "^2.0.8",

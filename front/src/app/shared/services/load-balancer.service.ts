@@ -3,6 +3,7 @@ import {HttpClient, HttpResponse} from '@angular/common/http';
 import {SERVER_API_URL} from '../../app.constants';
 import {Observable} from 'rxjs';
 import {IChartDataModel, IChartSetData} from "../model/chart-datatype.model";
+import {ILoadBalancerConfigModel} from "../model/load-balancer-config.model";
 
 type ChartResponseType = HttpResponse<IChartSetData>;
 
@@ -17,5 +18,8 @@ export class LoadBalancerService {
     }
     call(): Observable<HttpResponse<any>> {
       return this.http.get<any>('api/call', { observe: 'response' });
+    }
+    assignParameters(config: any): Observable<HttpResponse<ILoadBalancerConfigModel>> {
+      return this.http.post<ILoadBalancerConfigModel>('api/assign-params', config, {observe: 'response'});
     }
 }
