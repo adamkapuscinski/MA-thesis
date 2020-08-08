@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 services:
   eureka-server-peer1:
     image: adamkapuscinsky/ma-thesis-eureka-server
@@ -18,23 +18,23 @@ services:
     networks:
       - network-eureka
   eureka-client-peer2:
-    image: adamkapuscinsky/ma-thesis-eureka-client-servicetwo
+    image: adamkapuscinsky/ma-thesis-eureka-client-serviceone
     container_name: eureka-client-peer2
     environment:
+      - APPLICATION_NAME=servicetwo
       - ENVIRONMENT_HOST=eureka-server-peer1
-      - port=28881
     ports:
-      - "28881:28881"
+      - "28881:28880"
     networks:
       - network-eureka
   eureka-client-peer3:
-    image: adamkapuscinsky/ma-thesis-eureka-client-servicethree
+    image: adamkapuscinsky/ma-thesis-eureka-client-serviceone
     container_name: eureka-client-peer3
     environment:
+      - APPLICATION_NAME=servicethree
       - ENVIRONMENT_HOST=eureka-server-peer1
-      - port=28882
     ports:
-      - "28882:28882"
+      - "28882:28880"
     networks:
       - network-eureka
   api:
