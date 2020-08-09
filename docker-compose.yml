@@ -50,7 +50,7 @@ services:
   client:
     links:
       - api
-    image: adamkapuscinsky/ma-thesis-front
+    image: adamkapuscinsky/ma-thesis-front:1.0
     restart: on-failure
     container_name: client
     ports:

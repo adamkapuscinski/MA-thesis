@@ -35,6 +35,8 @@ export class LoadBalancerStatsComponent implements OnInit {
     this.config.defaultAppsRequestTime = [new DefaultRequestTimeModel("SERVICEONE", 100), new DefaultRequestTimeModel("SERVICETWO", 200), new DefaultRequestTimeModel("SERVICETHREE", 500)];
     this.config.callType = 'ESTABLISHED_PARAMS';
     this.config.methodType = 'AVERAGE_RESPONSE_TIME';
+    this.config.timeToShowInMinutes = 2;
+    this.config.synchronizationTime = 10;
   }
   callLoadBalancer() {
     this.calling = true;

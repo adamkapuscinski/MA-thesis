@@ -19,6 +19,8 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,16 +33,21 @@ public class LBProvider {
     private String[] registeredServices = new String[]{"SERVICEONE", "SERVICETWO", "SERVICETHREE"};
 
     private ChartDataModel data = new ChartDataModel();
-    private BalancingParamsTransmissionModel lastBalancingParamsTransmissionModel = new BalancingParamsTransmissionModel(BalancingMethodTypeEnum.AVERAGE_RESPONSE_TIME, RequestCallTypeEnum.ESTABLISHED_PARAMS, new ArrayList<>());
+    private BalancingParamsTransmissionModel lastBalancingParamsTransmissionModel = new BalancingParamsTransmissionModel(BalancingMethodTypeEnum.AVERAGE_RESPONSE_TIME, RequestCallTypeEnum.ESTABLISHED_PARAMS, new ArrayList<>(), 5, 10);
     private List<ServiceRequestData> recentRequestData = new ArrayList<>();
 
     private RestTemplate restTemplate;
     private DiscoveryClient discoveryClient;
     private BalancingStrategy balancingStrategy;
+    private int timeToShowInMinutes = 2;
+    private int synchronizationTime = 10;
+    DateTimeFormatter DATE_TIME_FORMATTER;
 
     public LBProvider(RestTemplate restTemplate, DiscoveryClient discoveryClient) {
         this.restTemplate = restTemplate;
         this.discoveryClient = discoveryClient;
+        DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss")
+                .withZone(ZoneId.systemDefault());
     }
 
     @PostConstruct
@@ -60,8 +67,6 @@ public class LBProvider {
     }
 
     ChartSetDataModel assignDataObject() {
-        int timeToShowInMinutes = 5;
-        int synchronizationTime = 10;
 
         ChartSetDataModel result = new ChartSetDataModel();
         ChartDataModel firstSet = new ChartDataModel();
@@ -88,7 +93,7 @@ public class LBProvider {
 
             do {
                 if (i == 0)
-                    labels.add(before.toString());
+                    labels.add(DATE_TIME_FORMATTER.format(before));
 
                 Instant finalBefore = before;
                 Instant finalCeilBefore = finalBefore.plus(synchronizationTime, ChronoUnit.SECONDS);
@@ -159,6 +164,8 @@ public class LBProvider {
             balancingStrategy.setDiscoveryClient(discoveryClient);
             recentRequestData = new ArrayList<>();
             lastBalancingParamsTransmissionModel = balancingParamsTransmissionModel;
+            timeToShowInMinutes = balancingParamsTransmissionModel.getTimeToShowInMinutes();
+            synchronizationTime = balancingParamsTransmissionModel.getSynchronizationTime();
         }
         return balancingParamsTransmissionModel;
     }

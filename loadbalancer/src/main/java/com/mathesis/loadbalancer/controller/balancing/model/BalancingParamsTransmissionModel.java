@@ -11,5 +11,6 @@ public class BalancingParamsTransmissionModel {
     private BalancingMethodTypeEnum methodType;
     private RequestCallTypeEnum callType;
     private List<DefaultAppRequestTime> defaultAppsRequestTime;
-
+    private int timeToShowInMinutes;
+    private int synchronizationTime;
 }
