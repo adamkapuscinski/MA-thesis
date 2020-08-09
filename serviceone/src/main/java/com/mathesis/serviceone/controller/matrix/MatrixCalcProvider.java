@@ -14,7 +14,7 @@ public class MatrixCalcProvider {
     }
     private static Matrix createRandomSizeMatrix() {
         int min = 0;
-        int range = 10000;
+        int range = 4000;
         int rand = (int)(Math.random() * range) + min;
         return new Matrix(rand, rand);
     }

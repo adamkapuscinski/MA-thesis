@@ -9,7 +9,7 @@ services:
     networks:
       - network-eureka
   eureka-client-peer1:
-    image: adamkapuscinsky/ma-thesis-eureka-client-serviceone
+    image: adamkapuscinsky/ma-thesis-eureka-client-serviceone:1.0
     container_name: eureka-client-peer1
     environment:
       - ENVIRONMENT_HOST=eureka-server-peer1
@@ -18,7 +18,7 @@ services:
     networks:
       - network-eureka
   eureka-client-peer2:
-    image: adamkapuscinsky/ma-thesis-eureka-client-serviceone
+    image: adamkapuscinsky/ma-thesis-eureka-client-serviceone:1.0
     container_name: eureka-client-peer2
     environment:
       - APPLICATION_NAME=servicetwo
@@ -28,7 +28,7 @@ services:
     networks:
       - network-eureka
   eureka-client-peer3:
-    image: adamkapuscinsky/ma-thesis-eureka-client-serviceone
+    image: adamkapuscinsky/ma-thesis-eureka-client-serviceone:1.0
     container_name: eureka-client-peer3
     environment:
       - APPLICATION_NAME=servicethree
